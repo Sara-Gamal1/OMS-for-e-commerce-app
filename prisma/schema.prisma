@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+ 
+}
+
+model user {
+  userId   Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  address  String
+  password String
+
+  cart cart?  //one to one
+  orders order[]  //one to many
+ 
+}
+
+model product {
+  productId   Int    @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  stock       Int
+
+
+  carts productsOnCarts[]  //many to many
+  orders productsOnOrders[]  //many to many
+}
+
+model order {
+  orderId   Int      @id @default(autoincrement())
+  status    status
+  orderDate DateTime @default(now())
+  
+  user      user      @relation(fields: [userId], references: [userId])   //many to one
+  userId    Int    
+  
+  products productsOnOrders[] //many to many
+
+
+
+}
+
+enum status {
+  WAITING
+  DELIVERED
+}
+
+model cart {
+  cartId Int @id @default(autoincrement())
+
+  user      user     @relation(fields: [userId], references: [userId])  //one to one
+  userId    Int     @unique  
+
+  products productsOnCarts[]  //many to many
+
+}
+
+
+//many to many 
+model productsOnCarts {
+  product       product     @relation(fields: [productId], references: [productId])
+  productId     Int 
+  cart   cart @relation(fields: [cartId], references: [cartId])
+  cartId Int 
+  
+  @@id([cartId, productId])
+}
+
+//many to many 
+model productsOnOrders {
+  product       product     @relation(fields: [productId], references: [productId])
+  productId     Int 
+  order   order @relation(fields: [orderId], references: [orderId])
+  orderId Int 
+  
+  @@id([orderId, productId])
+}
