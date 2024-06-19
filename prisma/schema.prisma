@@ -42,7 +42,7 @@ model order {
   orderId   Int      @id @default(autoincrement())
   status    status
   orderDate DateTime @default(now())
-  
+  price Int @default(0)
   user      user      @relation(fields: [userId], references: [userId])   //many to one
   userId    Int    
   
@@ -55,6 +55,7 @@ model order {
 enum status {
   WAITING
   DELIVERED
+  CANCELLED
 }
 
 model cart {
@@ -74,7 +75,7 @@ model productsOnCarts {
   productId     Int 
   cart   cart @relation(fields: [cartId], references: [cartId])
   cartId Int 
-  
+  quantity Int @default(1) 
   @@id([cartId, productId])
 }
 
@@ -84,6 +85,8 @@ model productsOnOrders {
   productId     Int 
   order   order @relation(fields: [orderId], references: [orderId])
   orderId Int 
+  quantity Int @default(1) 
+
   
   @@id([orderId, productId])
 }
