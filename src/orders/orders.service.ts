@@ -144,4 +144,44 @@ export class OrdersService {
       },
     });
   }
+  async applyCoupon(couponCode: string, orderId: number) {
+    const order = await this.databaseService.order.findUnique({
+      where: { orderId: orderId },
+    });
+
+    if (!order) {
+      throw new HttpException('order not found .', HttpStatus.NOT_FOUND);
+    }
+    if (order.couponId || order.status != 'PROCESSING') {
+      throw new HttpException(
+        'coupon cannot be applied.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const coupon = await this.databaseService.coupon.findUnique({
+      where: {
+        code: couponCode,
+      },
+    });
+    if (!coupon) {
+      throw new HttpException(
+        'no coupon with that code.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const currentDate = new Date();
+    if (coupon.expiryDate <= currentDate) {
+      throw new HttpException('coupon not valid.', HttpStatus.BAD_REQUEST);
+    }
+    const newPrice = order.price - (coupon.discount / 100.0) * order.price;
+    return await this.databaseService.order.update({
+      where: {
+        orderId: orderId,
+      },
+      data: {
+        price: newPrice,
+        couponId: coupon.couponId,
+      },
+    });
+  }
 }

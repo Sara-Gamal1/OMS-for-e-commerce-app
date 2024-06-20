@@ -42,12 +42,13 @@ model order {
   orderId   Int      @id @default(autoincrement())
   status    status
   orderDate DateTime @default(now())
-  price Int @default(0)
+  price Float @default(0)
   user      user      @relation(fields: [userId], references: [userId])   //many to one
   userId    Int    
   
   products productsOnOrders[] //many to many
-
+  coupon        coupon?           @relation(fields: [couponId], references: [couponId])
+  couponId      Int?
 
 
 }
@@ -89,4 +90,14 @@ model productsOnOrders {
 
   
   @@id([orderId, productId])
+}
+
+
+model coupon {
+  couponId   Int      @id @default(autoincrement())
+  code       String   @unique
+  discount   Float
+  expiryDate DateTime
+   orders     order[]
+
 }

@@ -10,11 +10,12 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto, UpdateOrderStatusDto } from './dto/dto';
+import { CreateOrderDto, UpdateOrderStatusDto, CouponDto } from './dto/dto';
 import {
   GetOrderResponseDto,
   UpdateOrderStatusResponseDto,
   CreateOrderResponseDto,
+  orderDTO,
 } from './dto/order.dto';
 @Controller('api/orders')
 export class OrdersController {
@@ -31,7 +32,7 @@ export class OrdersController {
   @ApiResponse({ status: 404, description: 'Cart not found' })
   async createOrder(@Body(ValidationPipe) createOrderDto: CreateOrderDto) {
     const order = await this.orderService.createOrder(createOrderDto.userId);
-    return { order, messgae: 'created successfully' };
+    return { order, message: 'created successfully' };
   }
   @Get(':orderId')
   @ApiOperation({ summary: 'Get order details by ID' })
@@ -62,6 +63,25 @@ export class OrdersController {
       orderId,
       updateOrderStatusDto.status,
     );
-    return { order, messgae: 'updated successfully' };
+    return { order, message: 'updated successfully' };
+  }
+
+  @Post('apply-coupon')
+  @ApiOperation({ summary: 'Apply a coupon to an order' })
+  @ApiResponse({
+    status: 200,
+    description: 'Coupon applied successfully',
+    type: orderDTO,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Order already has a coupon or invalid coupon code',
+  })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  async applyCoupon(@Body(ValidationPipe) couponDto: CouponDto) {
+    return await this.orderService.applyCoupon(
+      couponDto.couponCode,
+      couponDto.orderId,
+    );
   }
 }

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-class orderDTO {
+export class orderDTO {
   @ApiProperty({ example: 1, description: 'The ID of the created order' })
   orderId: number;
 
@@ -15,6 +15,8 @@ class orderDTO {
 
   @ApiProperty({ example: 1, description: 'The ID of the user' })
   userId: number;
+  @ApiProperty({ example: 1, description: 'The ID of the coupon' })
+  couponId: number;
 
   @ApiProperty({
     example: '2024-06-20T13:20:59.541Z',

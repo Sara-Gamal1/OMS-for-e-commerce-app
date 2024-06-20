@@ -62,6 +62,9 @@ function clearDatabase() {
                     return [4 /*yield*/, prisma.product.deleteMany({})];
                 case 6:
                     _a.sent();
+                    return [4 /*yield*/, prisma.coupon.deleteMany({})];
+                case 7:
+                    _a.sent();
                     console.log('Database cleared successfully!');
                     return [2 /*return*/];
             }
@@ -70,6 +73,7 @@ function clearDatabase() {
 }
 function seedData() {
     return __awaiter(this, void 0, void 0, function () {
+        var coupons, _i, coupons_1, coupon;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: 
@@ -81,6 +85,7 @@ function seedData() {
                     // Seed users
                     return [4 /*yield*/, prisma.user.create({
                             data: {
+                                userId: 1,
                                 name: 'John Doe',
                                 email: 'john.doe@example.com',
                                 address: '123 Main St, Anytown, USA',
@@ -95,6 +100,7 @@ function seedData() {
                     _a.sent();
                     return [4 /*yield*/, prisma.user.create({
                             data: {
+                                userId: 2,
                                 name: 'Jane Smith',
                                 email: 'jane.smith@example.com',
                                 address: '456 Oak Ave, Smalltown, USA',
@@ -109,6 +115,7 @@ function seedData() {
                     _a.sent();
                     return [4 /*yield*/, prisma.user.create({
                             data: {
+                                userId: 3,
                                 name: 'Michael Brown',
                                 email: 'michael.brown@example.com',
                                 address: '789 Elm Rd, Villageville, USA',
@@ -156,6 +163,38 @@ function seedData() {
                         })];
                 case 7:
                     _a.sent();
+                    coupons = [
+                        {
+                            code: 'DISCOUNT10',
+                            discount: 10.0,
+                            expiryDate: new Date('2024-12-31'),
+                        },
+                        {
+                            code: 'SAVE20',
+                            discount: 20.0,
+                            expiryDate: new Date('2024-12-31'),
+                        },
+                        {
+                            code: 'FREESHIP',
+                            discount: 5.0,
+                            expiryDate: new Date('2024-12-31'),
+                        },
+                    ];
+                    _i = 0, coupons_1 = coupons;
+                    _a.label = 8;
+                case 8:
+                    if (!(_i < coupons_1.length)) return [3 /*break*/, 11];
+                    coupon = coupons_1[_i];
+                    return [4 /*yield*/, prisma.coupon.createMany({
+                            data: coupon,
+                        })];
+                case 9:
+                    _a.sent();
+                    _a.label = 10;
+                case 10:
+                    _i++;
+                    return [3 /*break*/, 8];
+                case 11:
                     console.log('Seed data created successfully!');
                     return [2 /*return*/];
             }
