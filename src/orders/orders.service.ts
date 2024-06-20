@@ -54,7 +54,7 @@ export class OrdersService {
     }
     const order = await this.databaseService.order.create({
       data: {
-        status: status.WAITING,
+        status: status.PROCESSING,
         price: totalPrice,
         userId: userId,
       },
@@ -124,7 +124,7 @@ export class OrdersService {
     if (!order) {
       throw new HttpException('order not found .', HttpStatus.NOT_FOUND);
     }
-    if (Status == status.CANCELLED && order.status == status.WAITING) {
+    if (Status == status.CANCELLED && order.status == status.PROCESSING) {
       await Promise.all(
         order.products.map((update) =>
           this.databaseService.product.update({

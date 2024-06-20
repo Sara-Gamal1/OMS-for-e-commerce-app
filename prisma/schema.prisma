@@ -53,7 +53,7 @@ model order {
 }
 
 enum status {
-  WAITING
+  PROCESSING
   DELIVERED
   CANCELLED
 }
