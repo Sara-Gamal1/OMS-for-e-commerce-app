@@ -4,29 +4,33 @@ import {
   Post,
   Get,
   ParseIntPipe,
-  Query,
   Put,
   Param,
+  ValidationPipe,
 } from '@nestjs/common';
 
 import { OrdersService } from './orders.service';
-import { status } from '@prisma/client';
+import { CreateOrderDto, UpdateOrderStatusDto } from './dto/dto';
+
 @Controller('api/orders')
 export class OrdersController {
   constructor(private readonly orderService: OrdersService) {}
   @Post()
-  async createOrder(@Body() body: { userId: number }) {
-    return await this.orderService.createOrder(body.userId);
+  async createOrder(@Body(ValidationPipe) createOrderDto: CreateOrderDto) {
+    return await this.orderService.createOrder(createOrderDto.userId);
   }
-  @Get()
-  async getUserCart(@Query('orderId', ParseIntPipe) orderId: number) {
+  @Get(':orderId')
+  async getUserCart(@Param('orderId', ParseIntPipe) orderId: number) {
     return await this.orderService.getOrder(orderId);
   }
-  @Put('status')
+  @Put(':orderId/status')
   async updateOrderStatus(
-    @Query('orderId', ParseIntPipe) orderId: number,
-    @Body() body: { status: status },
+    @Param('orderId', ParseIntPipe) orderId: number,
+    @Body(ValidationPipe) updateOrderStatusDto: UpdateOrderStatusDto,
   ) {
-    return await this.orderService.updateOrderStatus(orderId, body.status);
+    return await this.orderService.updateOrderStatus(
+      orderId,
+      updateOrderStatusDto.status,
+    );
   }
 }

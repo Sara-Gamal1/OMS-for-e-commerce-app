@@ -110,6 +110,7 @@ export class OrdersService {
       products: products,
       orderId: order.orderId,
       price: order.price,
+      status: order.status,
     };
     return result;
   }
