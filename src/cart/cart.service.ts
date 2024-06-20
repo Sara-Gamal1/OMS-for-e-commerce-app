@@ -24,9 +24,16 @@ export class CartService {
         cartId: cart.cartId,
         productId: productId,
       },
+      include: {
+        product: true,
+      },
     });
 
     if (productInCart) {
+      if (productInCart.product.stock < productInCart.quantity + 1) {
+        throw new HttpException('product not in stock.', HttpStatus.CONFLICT);
+      }
+
       // Product already in the cart, increase quantity by 1
       const updatedProductInCart =
         await this.databaseService.productsOnCarts.update({
@@ -44,6 +51,12 @@ export class CartService {
         });
       return updatedProductInCart;
     } else {
+      const product = await this.databaseService.product.findFirst({
+        where: { productId: productId },
+      });
+      if (product.stock < 1) {
+        throw new HttpException('product not in stock.', HttpStatus.CONFLICT);
+      }
       // Product not in the cart, add it with quantity 1
       const newProductInCart =
         await this.databaseService.productsOnCarts.create({
@@ -149,6 +162,9 @@ export class CartService {
         cartId: cart.cartId,
         productId: productId,
       },
+      include: {
+        product: true,
+      },
     });
 
     if (!productInCart) {
@@ -156,6 +172,9 @@ export class CartService {
         'product not found in the cart.',
         HttpStatus.NOT_FOUND,
       );
+    }
+    if (productInCart.product.stock < quantity) {
+      throw new HttpException('product not in stock.', HttpStatus.CONFLICT);
     }
     if (quantity <= 0)
       await this.databaseService.productsOnCarts.delete({

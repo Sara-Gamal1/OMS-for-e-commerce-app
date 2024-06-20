@@ -30,31 +30,44 @@ export class OrdersService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const order = await this.databaseService.order.create({
-      data: {
-        status: status.WAITING,
-        userId: userId,
-      },
-    });
+
     let totalPrice = 0;
 
     const productsOnOrderData = [];
-    productsOnCart.forEach(function (product) {
+    const productUpdates = [];
+    for (const item of productsOnCart) {
+      if (item.quantity > item.product.stock) {
+        throw new HttpException('Product not in stock.', HttpStatus.CONFLICT);
+      }
+
+      totalPrice += item.product.price * item.quantity;
       productsOnOrderData.push({
-        productId: product.productId,
-        quantity: product.quantity,
-        orderId: order.orderId,
+        productId: item.productId,
+        quantity: item.quantity,
+        orderId: null, // Placeholder
       });
-      totalPrice += product.product.price * product.quantity;
-    });
-    await this.databaseService.order.update({
-      where: {
-        orderId: order.orderId,
-      },
+
+      productUpdates.push({
+        productId: item.productId,
+        quantity: item.quantity,
+      });
+    }
+    const order = await this.databaseService.order.create({
       data: {
+        status: status.WAITING,
         price: totalPrice,
+        userId: userId,
       },
     });
+    productsOnOrderData.forEach((item) => (item.orderId = order.orderId));
+    await Promise.all(
+      productUpdates.map((update) =>
+        this.databaseService.product.update({
+          where: { productId: update.productId },
+          data: { stock: { decrement: update.quantity } },
+        }),
+      ),
+    );
 
     // Insert products into productsOnOrder
     await this.databaseService.productsOnOrders.createMany({
@@ -67,6 +80,7 @@ export class OrdersService {
         cartId: cart.cartId,
       },
     });
+    return order;
   }
   async getOrder(orderId: number) {
     const order = await this.databaseService.order.findUnique({
@@ -99,20 +113,33 @@ export class OrdersService {
     };
     return result;
   }
-  async updateOrderStatus(orderId: number, status: status) {
+  async updateOrderStatus(orderId: number, Status: status) {
     const order = await this.databaseService.order.findUnique({
       where: { orderId: orderId },
+      include: {
+        products: true,
+      },
     });
-
     if (!order) {
       throw new HttpException('order not found .', HttpStatus.NOT_FOUND);
     }
+    if (Status == status.CANCELLED && order.status == status.WAITING) {
+      await Promise.all(
+        order.products.map((update) =>
+          this.databaseService.product.update({
+            where: { productId: update.productId },
+            data: { stock: { increment: update.quantity } },
+          }),
+        ),
+      );
+    }
+
     return await this.databaseService.order.update({
       where: {
         orderId: orderId,
       },
       data: {
-        status: status,
+        status: Status,
       },
     });
   }
