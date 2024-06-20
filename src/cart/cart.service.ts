@@ -35,21 +35,21 @@ export class CartService {
       }
 
       // Product already in the cart, increase quantity by 1
-      const updatedProductInCart =
-        await this.databaseService.productsOnCarts.update({
-          where: {
-            cartId_productId: {
-              cartId: cart.cartId,
-              productId: productId,
-            },
+
+      await this.databaseService.productsOnCarts.update({
+        where: {
+          cartId_productId: {
+            cartId: cart.cartId,
+            productId: productId,
           },
-          data: {
-            quantity: {
-              increment: 1,
-            },
+        },
+        data: {
+          quantity: {
+            increment: 1,
           },
-        });
-      return updatedProductInCart;
+        },
+      });
+      return { ...productInCart.product, quantity: productInCart.quantity + 1 };
     } else {
       const product = await this.databaseService.product.findFirst({
         where: { productId: productId },
@@ -58,15 +58,15 @@ export class CartService {
         throw new HttpException('product not in stock.', HttpStatus.CONFLICT);
       }
       // Product not in the cart, add it with quantity 1
-      const newProductInCart =
-        await this.databaseService.productsOnCarts.create({
-          data: {
-            cartId: cart.cartId,
-            productId: productId,
-            quantity: 1,
-          },
-        });
-      return newProductInCart;
+
+      await this.databaseService.productsOnCarts.create({
+        data: {
+          cartId: cart.cartId,
+          productId: productId,
+          quantity: 1,
+        },
+      });
+      return { ...product, quantity: 1 };
     }
   }
   async getCart(userId: number) {
@@ -81,21 +81,19 @@ export class CartService {
         HttpStatus.NOT_FOUND,
       );
     }
-    return await this.databaseService.productsOnCarts.findMany({
+    const products = await this.databaseService.productsOnCarts.findMany({
       where: {
         cartId: cart.cartId,
       },
       select: {
-        product: {
-          select: {
-            name: true,
-            description: true,
-            price: true,
-          },
-        },
+        product: true,
         quantity: true,
       },
     });
+    return products.map((productOnCart) => ({
+      ...productOnCart.product,
+      quantity: productOnCart.quantity,
+    }));
   }
 
   async removeProductFromCart(productId: number, userId: number) {
@@ -114,6 +112,9 @@ export class CartService {
         cartId: cart.cartId,
         productId: productId,
       },
+      include: {
+        product: true,
+      },
     });
 
     if (!productInCart) {
@@ -122,6 +123,7 @@ export class CartService {
         HttpStatus.NOT_FOUND,
       );
     }
+
     if (productInCart.quantity == 1)
       await this.databaseService.productsOnCarts.delete({
         where: {
@@ -132,7 +134,7 @@ export class CartService {
         },
       });
     else
-      return await this.databaseService.productsOnCarts.update({
+      await this.databaseService.productsOnCarts.update({
         where: {
           cartId_productId: {
             cartId: cart.cartId,
@@ -145,6 +147,7 @@ export class CartService {
           },
         },
       });
+    return { ...productInCart.product, quantity: productInCart.quantity - 1 };
   }
   async updateCart(productId: number, userId: number, quantity: number) {
     const cart = await this.databaseService.cart.findUnique({
@@ -176,6 +179,7 @@ export class CartService {
     if (productInCart.product.stock < quantity) {
       throw new HttpException('product not in stock.', HttpStatus.CONFLICT);
     }
+
     if (quantity <= 0)
       await this.databaseService.productsOnCarts.delete({
         where: {
@@ -186,7 +190,7 @@ export class CartService {
         },
       });
     else
-      return await this.databaseService.productsOnCarts.update({
+      await this.databaseService.productsOnCarts.update({
         where: {
           cartId_productId: {
             cartId: cart.cartId,
@@ -197,5 +201,6 @@ export class CartService {
           quantity: quantity,
         },
       });
+    return { ...productInCart.product, quantity };
   }
 }
