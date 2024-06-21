@@ -55,6 +55,14 @@ The Order Management System (OMS) is an essential component of our e-commerce mo
    # or
    yarn start
    ```
+7. **Run tests**
+   To execute all tests, use the following command:
+
+      ```sh
+      npm test
+      ```
+
+    ![tests](./images/test.png)
 
 ## API Endpoints
 
@@ -181,6 +189,7 @@ The Order Management System (OMS) is an essential component of our e-commerce mo
 - **Request Body**:
 
   - userId: (number, required): The ID of the user .
+
 - **Responses**:
 
   - Success
@@ -199,16 +208,18 @@ The Order Management System (OMS) is an essential component of our e-commerce mo
 
       Returned if the user's cart is empty or the specified user ID does not exist.
 
-     - Status: 409 conflict
+    - Status: 409 conflict
 
-       Returned if any product in the cart is not in stock or the quantity requested exceeds available stock.
+      Returned if any product in the cart is not in stock or the quantity requested exceeds available stock.
 
-### Get Order 
+### Get Order
+
 - **Endpoint**: `GET /api/orders/:orderId`
 - **Description**: This endpoint retrieves the details of a specific order by its order ID.
 - **Parameters**:
 
   - `orderID` (number): The ID of the order .
+
 - **Responses**:
 
   - Success
@@ -222,9 +233,11 @@ The Order Management System (OMS) is an essential component of our e-commerce mo
     - Status: 404 Not Found
 
       Returned if the order with the specified orderId does not exist..
+
 ### Apply Coupon to Order
+
 - **Endpoint**: `POST /api/orders/apply-coupon`
-- **Description**:  Applies a coupon to an order to apply a discount. Each order can have only one coupon applied at a time.
+- **Description**: Applies a coupon to an order to apply a discount. Each order can have only one coupon applied at a time.
 - **Request Body**:
 
   - orderID: (number, required): The code of the coupon to apply .
@@ -243,16 +256,19 @@ The Order Management System (OMS) is an essential component of our e-commerce mo
     - Status: 404 Not Found
 
       Returned if the order with the specified orderId does not exist.
+
     - Status: 400 Bad request
 
-      Returned if the request body is missing the couponCode or orderId fields or  if the order already has a coupon applied or if the provided couponCode is invalid.
+      Returned if the request body is missing the couponCode or orderId fields or if the order already has a coupon applied or if the provided couponCode is invalid.
 
 ### Update Order Status
+
 - **Endpoint**: `PUT /api/orders/:orderId/status`
 - **Description**: Updates the status of a specific order identified by orderId.
 - **Parameters**:
 
   - `orderId` (number): The ID of the order .
+
 - **Request Body**:
 
   - status: (enum, required): The updated status of the order. Possible values are CANCELLED, PROCESSING , DELIVERED .
@@ -270,11 +286,13 @@ The Order Management System (OMS) is an essential component of our e-commerce mo
     - Status: 404 Not Found
 
       Returned if the order with the specified orderId does not exist.
+
     - Status: 400 Bad request
 
       Returned if the request body is missing the status field or if the provided status value is invalid.
 
 ### Get History of orders
+
 - **Endpoint**: `GET /api/users/:userId/orders`
 - **Description**: Retrieves a list of orders associated with a specific user identified by userId.
 - **Parameters**:
@@ -295,3 +313,6 @@ The Order Management System (OMS) is an essential component of our e-commerce mo
 
       Returned if the user with the specified userId does not exist or if no orders are associated with the user.
 
+### For more detailed documentation, including request and response schemas, and additional features, please refer to the Swagger documentation provided with the application.
+
+![Swagger](./images/swagger.png)
