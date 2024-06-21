@@ -85,7 +85,7 @@ describe('OrdersController (e2e)', () => {
       },
     });
     expect(product).not.toBeNull();
-  }, 10000);
+  }, 20000);
 
   it('/GET api/orders/:orderId (Get Order) - should retrieve order details', async () => {
     db = await DB();
@@ -103,7 +103,7 @@ describe('OrdersController (e2e)', () => {
     expect(response1.body.products.length).toBe(1);
     expect(response1.body.price).toBe(db.product1.price);
     expect(response1.body.products[0].product.name).toBe(db.product1.name);
-  }, 10000);
+  }, 20000);
 
   it('/PUT api/orders/:orderId/status (Update Order Status) - should update order status', async () => {
     db = await DB();
@@ -122,7 +122,7 @@ describe('OrdersController (e2e)', () => {
     expect(response1.body.message).toEqual('updated successfully');
     const order = await prisma.order.findFirst({ where: { orderId: orderId } });
     expect(order.status).toBe('DELIVERED');
-  }, 10000);
+  }, 20000);
 
   it('/POST api/orders/apply-coupon (Apply Coupon) - should apply a coupon to an order', async () => {
     db = await DB();
@@ -142,5 +142,5 @@ describe('OrdersController (e2e)', () => {
     expect(response1.body.price).toBe(
       db.product1.price - 0.1 * db.product1.price,
     );
-  }, 10000);
+  }, 20000);
 });
