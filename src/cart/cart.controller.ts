@@ -32,7 +32,7 @@ export class CartController {
   @ApiOperation({ summary: 'Add a product to the cart' })
   @ApiBody({ type: AddProductToCartDto })
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'Product added to cart successfully.',
     type: AddProductToCartResponseDto,
   })

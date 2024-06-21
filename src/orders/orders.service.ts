@@ -25,10 +25,7 @@ export class OrdersService {
       },
     });
     if (productsOnCart.length === 0) {
-      throw new HttpException(
-        'no products in the cart.',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('no products in the cart.', HttpStatus.CONFLICT);
     }
 
     let totalPrice = 0;

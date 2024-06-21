@@ -15,6 +15,10 @@ export class UserController {
     description: 'The order history for the user',
     type: OrderHistoryResponseDto,
   })
+  @ApiResponse({
+    status: 404,
+    description: 'user does not exist',
+  })
   async getOrderHistory(@Param('userId', ParseIntPipe) userId: number) {
     const orders = await this.userService.getOrderHistory(userId);
     return { orders };

@@ -31,6 +31,11 @@ export class OrdersController {
   })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 404, description: 'Cart not found' })
+  @ApiResponse({
+    status: 409,
+    description:
+      'product in the cart is not in stock or the quantity requested exceeds available stock',
+  })
   async createOrder(@Body(ValidationPipe) createOrderDto: CreateOrderDto) {
     const order = await this.orderService.createOrder(createOrderDto.userId);
     return { order, message: 'created successfully' };
