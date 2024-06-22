@@ -77,7 +77,7 @@ The Order Management System (OMS) is an essential component of our e-commerce mo
     ![tests](./images/test.png)
 
 ## 🚀 API Endpoints  <a name = "APIEndpoints"></a>
-   ## 🛒Cart Management  <a name = "cart"></a>
+   ### 🛒Cart Management  <a name = "cart"></a>
    #### Add to Cart
    
    - **Endpoint**: `POST /api/cart/add`
@@ -92,13 +92,13 @@ The Order Management System (OMS) is an essential component of our e-commerce mo
    - **Description**: This endpoint updates the quantity of a product in the user's cart. It returns an error if the request body is missing required fields, if the product ID is invalid, if the cart or product is not found, or if the product is not in stock with the required quantity.
    
    
-   ### Remove From Cart
+   #### Remove From Cart
    
    - **Endpoint**: `DELETE /api/cart/remove`
    - **Description**: This endpoint removes a product from the user's cart. If the product quantity is 1, the product is removed; otherwise, the product quantity is decreased by 1. It returns an error if the request body is missing required fields, if the product ID is invalid, or if the user or product does not exist.
    
    
-   ## 📦Orders Management  <a name = "order"></a>
+   ### 📦Orders Management  <a name = "order"></a>
    
    
    #### Create Order
@@ -119,7 +119,7 @@ The Order Management System (OMS) is an essential component of our e-commerce mo
    #### Update Order Status
    - **Endpoint**: `PUT /api/orders/:orderId/status`
    - **Description**: Updates the status of a specific order identified by orderId. It returns an error if the order with the specified orderId does not exist, if the request body is missing the status field, or if the provided status value is invalid.
-   ## 🙋‍♂️User Management  <a name = "user"></a>
+   ### 🙋‍♂️User Management  <a name = "user"></a>
    #### Get History of orders
    
    - **Endpoint**: `GET /api/users/:userId/orders`
